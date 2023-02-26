@@ -1,11 +1,12 @@
 package main
 
 import (
-	"com.github.eshluke.helloworld/helper"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"com.github.eshluke.helloworld/gitlab"
+	"com.github.eshluke.helloworld/helper"
 	"github.com/mattermost/mattermost-server/plugin/rpcplugin"
 )
 
@@ -15,8 +16,17 @@ func (p *Plugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, world!")
 	var mr gitlab.MergeRequest
 	err := helper.DecodeJSONBody(w, r, &mr)
-	if err == nil {
-		fmt.Fprintf(w, "received: %s", mr.ObjectKind)
+	if err != nil {
+		var mr *helper.MalformedRequest
+		if errors.As(err, &mr) {
+			http.Error(w, mr.Msg, mr.Status)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	if mr.ObjectKind == "merge_request" {
+		fmt.Fprintf(w, "merge_request event received!!!")
 	}
 }
 
