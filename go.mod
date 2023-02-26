@@ -2,7 +2,10 @@ module com.github.eshluke.helloworld
 
 go 1.20
 
-require github.com/mattermost/mattermost-server v4.10.10+incompatible
+require (
+	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
+	github.com/mattermost/mattermost-server v4.10.10+incompatible
+)
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
