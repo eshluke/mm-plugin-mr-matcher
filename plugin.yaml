@@ -1,4 +1,4 @@
-id: com.github.eshluke.helloworld
+id: com.github.eshluke.mm-plugin-mr-matcher
 name: Server "Hello, world!"
 server:
   executable: plugin
