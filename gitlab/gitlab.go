@@ -175,3 +175,9 @@ type MergeRequest struct {
 		AvatarURL string `json:"avatar_url"`
 	} `json:"reviewers"`
 }
+
+func (mr *MergeRequest) ShouldBeMatched() bool {
+	return mr.ObjectKind == "merge_request" &&
+		(mr.ObjectAttributes.Action == "open" || mr.ObjectAttributes.Action == "reopen") &&
+		len(mr.Reviewers) == 0
+}

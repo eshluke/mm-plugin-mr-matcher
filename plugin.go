@@ -7,15 +7,14 @@ import (
 
 	"com.github.eshluke.helloworld/gitlab"
 	"com.github.eshluke.helloworld/helper"
-	"github.com/mattermost/mattermost-server/plugin"
-	"github.com/mattermost/mattermost-server/plugin/rpcplugin"
+	"github.com/mattermost/mattermost-server/v5/plugin"
 )
 
 type Plugin struct {
 	api plugin.API
 }
 
-func (p *Plugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
 	switch path := r.URL.Path; path {
 	case "/gitlab/mr":
 		p.handleMergeRequest(w, r)
@@ -50,5 +49,5 @@ func (p *Plugin) createPost(mr *gitlab.MergeRequest) {
 // This example demonstrates a plugin that handles HTTP requests which respond by greeting the
 // world.
 func main() {
-	rpcplugin.Main(&Plugin{})
+	plugin.ClientMain(&Plugin{})
 }

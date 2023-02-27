@@ -1,4 +1,4 @@
 id: com.github.eshluke.helloworld
 name: Server "Hello, world!"
-backend:
+server:
   executable: plugin
