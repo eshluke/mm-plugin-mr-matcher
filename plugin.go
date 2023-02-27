@@ -37,6 +37,12 @@ type Plugin struct {
 	configuration *configuration
 }
 
+func (p *Plugin) getClient() *model.Client4 {
+	client := model.NewAPIv4Client(_const.MMDOMAIN)
+	client.SetToken(_const.MMTOKEN)
+	return client
+}
+
 func (p *Plugin) getConfiguration() *configuration {
 	p.configurationLock.RLock()
 	defer p.configurationLock.RUnlock()
@@ -123,9 +129,9 @@ func (p *Plugin) handleMergeRequest(w http.ResponseWriter, r *http.Request) {
 
 func (p *Plugin) drawUserInChannel() (*model.User, error) {
 	//채널에서 맴버 리스트 불러오기
-	members, err := p.API.GetUsersInChannel(_const.MMCHANNELID, "", 0, 100)
-	if err != nil {
-		return nil, err
+	members, res := p.getClient().GetUsersInChannel(_const.MMCHANNELID, 0, 100, "")
+	if res.StatusCode >= 400 {
+		return nil, fmt.Errorf("GetUsersInChannel failed: %w", res.Error)
 	}
 	//그중에 랜덤으로 한명 고르기
 	rand.Seed(time.Now().UnixNano())
@@ -135,14 +141,17 @@ func (p *Plugin) drawUserInChannel() (*model.User, error) {
 func (p *Plugin) createPost(mr *gitlab.MergeRequest, reviewer *model.User) error {
 	//골라진 사람을 맨션하는 포스팅 올리기
 	message := fmt.Sprintf("@%s [Review Request] A new Merge Request has been created in %s by %s.",
-		reviewer.Username, mr.Project.Name, mr.User.Name)
+		reviewer.Username, mr.Project.Name, mr.User.Username)
 
 	// 새 게시물 작성
-	_, err := p.API.CreatePost(&model.Post{
+	_, res := p.getClient().CreatePost(&model.Post{
 		ChannelId: _const.MMCHANNELID,
 		Message:   message,
 	})
-	return err
+	if res.StatusCode >= 400 {
+		return fmt.Errorf("create post failed: %s", res.Error.Message)
+	}
+	return nil
 }
 
 func main() {
