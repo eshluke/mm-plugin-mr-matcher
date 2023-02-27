@@ -6,7 +6,7 @@ const (
 	MMTOKEN   = ""
 	MMTOKENID = ""
 
-	MMCHANNELID    = ""
+	MMCHANNELID    = "hk15fo6s138uzj5fq6aowmnnky"
 	gitlabRepoName = ""
 	mrTag          = ""
 )
